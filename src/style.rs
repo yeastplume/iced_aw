@@ -33,6 +33,12 @@ pub mod tab_bar;
 #[cfg(feature = "tab_bar")]
 pub use tab_bar::TabBarStyles;
 
+#[cfg(feature = "table")]
+pub mod table_row;
+#[cfg(feature = "table")]
+pub use table_row::TableRowStyles;
+
+
 #[cfg(feature = "time_picker")]
 pub mod time_picker;
 #[cfg(feature = "time_picker")]

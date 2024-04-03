@@ -100,6 +100,9 @@ pub type Tabs<'a, Message, TabId, Theme, Renderer> =
 #[cfg(feature = "tabs")]
 pub use tabs::TabBarPosition;
 
+#[cfg(feature = "table")]
+pub mod table;
+
 #[cfg(feature = "time_picker")]
 pub mod time_picker;
 #[cfg(feature = "time_picker")]

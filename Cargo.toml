@@ -27,6 +27,7 @@ icons = []
 modal = []
 tab_bar = []
 tabs = ["tab_bar"]
+table = []
 time_picker = ["chrono", "icons", "iced/canvas"]
 wrap = []
 number_input = ["num-traits"]
@@ -51,6 +52,7 @@ default = [
     "modal",
     "tab_bar",
     "tabs",
+    "table",
     "time_picker",
     "slide_bar",
     "wrap",

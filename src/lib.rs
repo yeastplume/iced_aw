@@ -97,6 +97,13 @@ mod platform {
     pub use {crate::style::ModalStyles, crate::widgets::modal, modal::Modal};
 
     #[doc(no_inline)]
+    #[cfg(feature = "table")]
+    pub use {
+        crate::style::TableRowStyles, crate::widgets::table,
+        crate::widgets::table::TableRow,
+    };
+
+    #[doc(no_inline)]
     #[cfg(feature = "tab_bar")]
     pub use {
         crate::style::TabBarStyles,
