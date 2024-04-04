@@ -102,6 +102,7 @@ members = [
     "examples/multiple_modals",
     "examples/tab_bar",
     "examples/tabs",
+    "examples/table",
     "examples/time_picker",
     "examples/sliderbar",
     "examples/wrap",

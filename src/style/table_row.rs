@@ -9,6 +9,7 @@ use iced::{border::Radius, Background, Color, Theme};
 
 /// The appearance of a [`TableRow`](crate::native::table::TableRow).
 ///
+
 #[derive(Clone, Copy, Debug)]
 pub struct Appearance {
     /// The table row's background.

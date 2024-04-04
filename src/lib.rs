@@ -99,8 +99,8 @@ mod platform {
     #[doc(no_inline)]
     #[cfg(feature = "table")]
     pub use {
-        crate::style::TableRowStyles, crate::widgets::table,
-        crate::widgets::table::TableRow,
+        crate::style::TableRowStyles, crate::style::TableHeaderStyles, crate::widgets::table,
+        crate::widgets::table::TableRow, crate::widgets::table::TableHeader,
     };
 
     #[doc(no_inline)]
