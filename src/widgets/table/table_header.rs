@@ -17,12 +17,24 @@ use iced::{
 };
 
 #[derive(Clone, Debug, Default)]
+/// The state of the [`TableHeader`]
 pub struct TableHeaderState {
+	/// Whether the cursor is hovering over the resize area
 	pub resize_hovering: bool,
+
+	/// Whether the [`TableHeader`] is currently resizing
 	pub resizing: bool,
+
+	/// The starting cursor position when resizing
 	pub starting_cursor_pos: Option<Point>,
+
+	/// The starting width of the left column when resizing 
 	pub starting_left_width: f32,
+
+	/// The starting width of the right column when resizing
 	pub starting_right_width: f32,
+
+	/// the index of the column being resized 
 	pub resizing_idx: usize,
 }
 
@@ -60,7 +72,7 @@ pub use crate::style::table_header::StyleSheet;
 
 pub struct TableHeader<'a, Message, Theme = iced::Theme, Renderer = iced::Renderer>
 where
-	Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
+	Renderer: 'a + renderer::Renderer,
 	Theme: StyleSheet,
 {
 	spacing: u16,
@@ -78,7 +90,7 @@ where
 
 impl<'a, Message, Theme, Renderer> TableHeader<'a, Message, Theme, Renderer>
 where
-	Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
+	Renderer: 'a + renderer::Renderer,
 	Theme: StyleSheet,
 	Message: 'a,
 {
@@ -90,7 +102,7 @@ where
 		right_margin: Option<Length>,
 	) -> Self
 	where
-		Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
+		Renderer: 'a + renderer::Renderer,
 		Theme: StyleSheet,
 	{
 		let mut names = vec![];
@@ -198,7 +210,7 @@ where
 impl<'a, Message, Theme, Renderer> Widget<Message, Theme, Renderer>
 	for TableHeader<'a, Message, Theme, Renderer>
 where
-	Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
+	Renderer: 'a + renderer::Renderer,
 	Theme: StyleSheet,
 {
 	fn children(&self) -> Vec<Tree> {
@@ -415,7 +427,7 @@ impl<'a, Message, Theme, Renderer> From<TableHeader<'a, Message, Theme, Renderer
 	for Element<'a, Message, Theme, Renderer>
 where
 	Message: 'a,
-	Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
+	Renderer: 'a + renderer::Renderer,
 	Theme: 'a + StyleSheet
 {
 	fn from(header: TableHeader<'a, Message, Theme, Renderer>) -> Self {

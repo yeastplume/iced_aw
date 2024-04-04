@@ -16,7 +16,6 @@ use iced::{
     Size, Vector
 };
 
-
 pub use crate::style::table_row::StyleSheet;
 
 /// A selectable table row

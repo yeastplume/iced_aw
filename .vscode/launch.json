@@ -295,6 +295,25 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Debug executable 'table'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=table",
+                    "--package=table"
+                ],
+                "filter": {
+                    "name": "table",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+ 
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug executable 'tab_bar'",
             "cargo": {
                 "args": [

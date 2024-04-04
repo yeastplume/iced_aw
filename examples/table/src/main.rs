@@ -1,10 +1,11 @@
 use iced::{
     alignment, font,
+    futures::stream::Count,
     mouse::Interaction,
-    widget::{container, text, Button, Column, Row, Text, TextInput},
+    widget::{container, text, Button, Column, Container, Row, Text, TextInput},
     Alignment, Application, Command, Element, Length, Settings, Theme,
 };
-use iced_aw::TableRow;
+use iced_aw::{TableHeader, TableHeaderState, TableRow};
 
 fn main() -> iced::Result {
     TableExample::run(Settings {
@@ -15,11 +16,7 @@ fn main() -> iced::Result {
 
 #[derive(Debug, Clone)]
 enum Message {
-    TabSelected(usize),
-    TabClosed(usize),
-    TabLabelInputChanged(String),
-    TabContentInputChanged(String),
-    NewTab,
+    BlankMessage,
     #[allow(dead_code)]
     Loaded(Result<(), String>),
     FontLoaded(Result<(), font::Error>),
@@ -33,10 +30,7 @@ enum TableExample {
 
 #[derive(Debug)]
 struct State {
-    active_tab: usize,
-    new_tab_label: String,
-    new_tab_content: String,
-    tabs: Vec<(String, String)>,
+    header_state: TableHeaderState,
 }
 
 async fn load() -> Result<(), String> {
@@ -44,7 +38,7 @@ async fn load() -> Result<(), String> {
 }
 
 impl TableExample {
-    /*pub fn SampleRowData() -> Element<'static, Message, Theme, Renderer> {
+    /*pub fn sample_header() -> Element<'static, Message, Theme, Renderer> {
         let row = TableRow::new(
             Text::new("Row 1"),
             1,
@@ -55,6 +49,29 @@ impl TableExample {
         //.on_press(|_| Interaction::RowSelected(1));
         row.into()
     }*/
+
+    pub fn sample_header<'a>(
+        &self,
+        state: &State,
+    ) -> TableHeader<'a, Message, Theme, iced::Renderer> {
+        let column_keys = vec!["Column 1", "Column 2", "Column 3"];
+        let mut column_headers = vec![];
+        for column_key in column_keys.iter() {
+            let column_header_button = Button::new(
+                Text::new(*column_key)
+                    .size(30.0)
+            ).width(Length::Fill);
+            // TODO: On press
+
+            let column_header_container = Container::new(column_header_button)
+                .width(Length::Fixed(200.0))
+                .height(Length::Fixed(100.0));
+
+            column_headers.push(((*column_key).to_owned(), column_header_container.into()));
+        }
+
+        TableHeader::new(state.header_state.clone(), column_headers, None, None).spacing(10).width(Length::Fill)
+    }
 }
 
 impl Application for TableExample {
@@ -88,41 +105,13 @@ impl Application for TableExample {
             TableExample::Loading => {
                 if let Message::Loaded(_) = message {
                     *self = TableExample::Loaded(State {
-                        active_tab: 0,
-                        new_tab_label: String::new(),
-                        new_tab_content: String::new(),
-                        tabs: Vec::new(),
+                        header_state: TableHeaderState::default(),
                     })
                 }
             }
             TableExample::Loaded(state) => match message {
-                Message::TabSelected(index) => {
-                    println!("Tab selected: {}", index);
-                    state.active_tab = index
-                }
-                Message::TabClosed(index) => {
-                    state.tabs.remove(index);
-                    println!("active tab before: {}", state.active_tab);
-                    state.active_tab = if state.tabs.is_empty() {
-                        0
-                    } else {
-                        usize::max(0, usize::min(state.active_tab, state.tabs.len() - 1))
-                    };
-                    println!("active tab after: {}", state.active_tab);
-                }
-                Message::TabLabelInputChanged(value) => state.new_tab_label = value,
-                Message::TabContentInputChanged(value) => state.new_tab_content = value,
-                Message::NewTab => {
-                    println!("New");
-                    if !state.new_tab_label.is_empty() && !state.new_tab_content.is_empty() {
-                        println!("Create");
-                        state.tabs.push((
-                            state.new_tab_label.to_owned(),
-                            state.new_tab_content.to_owned(),
-                        ));
-                        state.new_tab_label.clear();
-                        state.new_tab_content.clear();
-                    }
+                Message::BlankMessage => {
+                    println!("Loaded")
                 }
                 _ => {}
             },
@@ -143,56 +132,7 @@ impl Application for TableExample {
             .center_y()
             .center_x()
             .into(),
-            TableExample::Loaded(state) => {
-                Column::new()
-                    .push(
-                        Row::new()
-                            .push(
-                                TextInput::new("Tab label", &state.new_tab_label)
-                                    .on_input(Message::TabLabelInputChanged)
-                                    .size(16)
-                                    .padding(5.0),
-                            )
-                            .push(
-                                TextInput::new("Tab content", &state.new_tab_content)
-                                    .on_input(Message::TabContentInputChanged)
-                                    .size(12)
-                                    .padding(5.0),
-                            )
-                            .push(Button::new(Text::new("New")).on_press(Message::NewTab))
-                            .align_items(Alignment::Center)
-                            .padding(10.0)
-                            .spacing(5.0),
-                    )
-                    .push(
-                        /*state
-                        .tabs
-                        .iter()
-                        .fold(
-                            TableRow::new(Message::TabSelected),
-                            |tab_bar, (tab_label, _)| {
-                                // manually create a new index for the new tab
-                                // starting from 0, when there is no tab created yet
-                                let idx = tab_bar.size();
-                                tab_bar.push(idx, TabLabel::Text(tab_label.to_owned()))
-                            },
-                        )
-                        .on_close(Message::TabClosed)*/
-                        TableRow::new(Text::new("Row 1"), 1)
-                            .padding(10.into())
-                            .width(Length::Fill)
-                            .height(Length::Fixed(50.0.into())),
-                    )
-                    .push(
-                        if let Some((_, content)) = state.tabs.get(state.active_tab) {
-                            Text::new(content)
-                        } else {
-                            Text::new("Please create a new tab")
-                        }
-                        .size(25),
-                    )
-                    .into()
-            }
+            TableExample::Loaded(state) => Column::new().push(self.sample_header(state)).into(),
         }
     }
 }
