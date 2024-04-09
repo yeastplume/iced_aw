@@ -5,7 +5,7 @@ use iced::{
     widget::{container, text, Button, Column, Container, Row, Text, TextInput},
     Alignment, Application, Command, Element, Length, Settings, Theme,
 };
-use iced_aw::{TableHeader, TableHeaderState, TableRow};
+use iced_aw::{style::table_row, TableHeader, TableHeaderState, TableHeaderStyles, TableRow, TableRowStyles};
 
 fn main() -> iced::Result {
     TableExample::run(Settings {
@@ -38,17 +38,32 @@ async fn load() -> Result<(), String> {
 }
 
 impl TableExample {
-    /*pub fn sample_header() -> Element<'static, Message, Theme, Renderer> {
-        let row = TableRow::new(
-            Text::new("Row 1"),
-            1,
-        )
-        .padding(10.into())
-        .width(Length::Fill)
-        .height(Length::Fixed(50.0.into()));
-        //.on_press(|_| Interaction::RowSelected(1));
-        row.into()
-    }*/
+    pub fn sample_cell<'a>(row_id: u16, col_id: u16) -> Text<'a> {
+        Text::new(format!("Column {}_{}", row_id, col_id))
+            .width(Length::Fill)
+            .height(Length::Fixed(50.0.into()))
+    }
+
+    pub fn sample_row<'a>(col_count: u16, row_id: u16) -> Vec<Text<'a>> {
+        let mut col_data = vec![];
+        for i in 0..col_count {
+            col_data.push(TableExample::sample_cell(i, row_id));
+        }
+        col_data
+    }
+
+    pub fn sample_table_rows<'a>(
+        &self,
+        row_count: u16,
+        col_count: u16,
+    ) -> Vec<TableRow<'a, Message, Theme, iced::Renderer>> {
+        let mut table_rows = vec![];
+        for i in 0..row_count {
+            let row = TableExample::sample_row(col_count, i);
+            table_rows.push(TableRow::new(row, i).style(TableRowStyles::Default));
+        }
+        table_rows
+    }
 
     pub fn sample_header<'a>(
         &self,
@@ -57,20 +72,18 @@ impl TableExample {
         let column_keys = vec!["Column 1", "Column 2", "Column 3"];
         let mut column_headers = vec![];
         for column_key in column_keys.iter() {
-            let column_header_button = Button::new(
-                Text::new(*column_key)
-                    .size(30.0)
-            ).width(Length::Fill);
+            let column_header_button = Button::new(Text::new(*column_key).size(20.0));
             // TODO: On press
 
-            let column_header_container = Container::new(column_header_button)
-                .width(Length::Fixed(200.0))
-                .height(Length::Fixed(100.0));
+            let column_header_container = Container::new(column_header_button);
 
             column_headers.push(((*column_key).to_owned(), column_header_container.into()));
         }
 
-        TableHeader::new(state.header_state.clone(), column_headers, None, None).spacing(10).width(Length::Fill)
+        TableHeader::new(state.header_state.clone(), column_headers, None, None)
+            .spacing(5)
+            .width(Length::Fill)
+            .style(TableHeaderStyles::Default)
     }
 }
 
@@ -132,7 +145,13 @@ impl Application for TableExample {
             .center_y()
             .center_x()
             .into(),
-            TableExample::Loaded(state) => Column::new().push(self.sample_header(state)).into(),
+            TableExample::Loaded(state) => {
+                let mut col = Column::new().push(self.sample_header(state));
+                for row in self.sample_table_rows(12, 3) {
+                    col = col.push(row);
+                }
+                col.into()
+            }
         }
     }
 }

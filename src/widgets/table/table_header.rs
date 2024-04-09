@@ -12,7 +12,7 @@ use iced::{
 	widget::space::Space,
     event,
     mouse,
-    Alignment, Element, Event, Length, Padding, Point, Rectangle,
+    Alignment, Border, Element, Event, Length, Padding, Point, Rectangle,
     Size
 };
 
@@ -76,6 +76,7 @@ where
 	Theme: StyleSheet,
 {
 	spacing: u16,
+	padding: Padding,
 	width: Length,
 	height: Length,
 	state: TableHeaderState,
@@ -130,8 +131,9 @@ where
 
 		Self {
 			spacing: 0,
+			padding: Padding::ZERO,
 			width: Length::Fill,
-			height: Length::Fill,
+			height: Length::Shrink,
 			leeway: 0,
 			state,
 			on_resize: None,
@@ -230,12 +232,16 @@ where
 
 	fn layout(
 		&self,
-		_tree: &mut Tree,
+		tree: &mut Tree,
 		renderer: &Renderer,
 		limits: &Limits,
 	) -> Node {
-		let limits = limits.width(self.width).height(self.height);
-		let mut trees = self.children();
+
+		let limits = limits
+			.loose()
+			.width(self.width)
+			.height(self.height)
+			.shrink(self.padding);
 
 		flex::resolve(
 			flex::Axis::Horizontal,
@@ -243,11 +249,11 @@ where
 			&limits,
 			self.width,
 			self.height,
-			Padding::ZERO,
+			self.padding,
 			self.spacing as f32,
 			Alignment::Start,
 			&self.children,
-			&mut trees,
+			&mut tree.children,
 		)
 	}
 
@@ -390,6 +396,36 @@ where
 		cursor: mouse::Cursor,
 		viewport: &Rectangle,
 	) {
+		let bounds = layout.bounds();
+		let cursor_position = cursor.position().unwrap_or_default();
+		let is_mouse_over = bounds.contains(cursor_position);
+
+		let appearance = if is_mouse_over {
+			theme.hovered(&self.style)
+		} else {
+			theme.appearance(&self.style)
+		};
+
+		let background = renderer::Quad {
+			bounds: Rectangle {
+				x: bounds.x + appearance.offset_left as f32,
+				y: bounds.y,
+				width: bounds.width - appearance.offset_right as f32,
+				height: bounds.height,
+			},
+			border: Border {
+				width: appearance.border_width,
+				color: appearance.border_color,
+				radius: appearance.border_radius.into(),
+			},
+			shadow: Default::default(),
+		};
+
+		renderer.fill_quad(
+			background.into(),
+			appearance.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+		);
+
 		for ((child, state), layout) in self
 			.children
 			.iter()
@@ -398,7 +434,7 @@ where
 		{
 			child
 				.as_widget()
-				.draw(state, renderer, theme, style, layout, cursor, viewport);
+				.draw(state, renderer, theme, style, layout, cursor, viewport)
 		}
 	}
 

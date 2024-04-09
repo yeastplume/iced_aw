@@ -40,16 +40,16 @@ pub trait StyleSheet {
     type Style: Default;
 
     /// The default appearance of a table row.
-    fn appearance(&self, style: &Self::Style, row_id: u32) -> Appearance;
+    fn appearance(&self, style: &Self::Style, row_id: u16) -> Appearance;
 
     /// The appearance of a table row when it is hovered over.
-    fn hovered(&self, style: &Self::Style, row_id: u32) -> Appearance;
+    fn hovered(&self, style: &Self::Style, row_id: u16) -> Appearance;
 }
 
 impl Default for Appearance {
     fn default() -> Self {
         Self {
-            text_color: [0.1, 0.1, 0.1].into(),
+            text_color: [1.0, 1.0, 1.0].into(),
             background: None,
             border_radius: 0.0.into(),
             border_width: 0.0,
@@ -83,16 +83,16 @@ impl TableRowStyles {
 impl StyleSheet for Theme {
     type Style = TableRowStyles;
 
-    fn appearance(&self, style: &Self::Style, row_id: u32) -> Appearance {
+    fn appearance(&self, style: &Self::Style, row_id: u16) -> Appearance {
         let palette = self.extended_palette();
 
         match style {
             TableRowStyles::Default => Appearance {
                 text_color: palette.primary.strong.color,
                 background: Some(Background::Color(palette.primary.base.color)),
-                border_radius: 0.0.into(),
-                border_width: 0.0,
-                border_color: Color::TRANSPARENT,
+                border_radius: 1.0.into(),
+                border_width: 1.0,
+                border_color: Color::BLACK,
                 offset_left: 0.0,
                 offset_right: 0.0,
             },
@@ -138,7 +138,7 @@ impl StyleSheet for Theme {
         }
     }
 
-    fn hovered(&self, style: &Self::Style, row_id: u32) -> Appearance {
+    fn hovered(&self, style: &Self::Style, row_id: u16) -> Appearance {
         let palette = self.extended_palette();
         match style {
             TableRowStyles::Default => Appearance {

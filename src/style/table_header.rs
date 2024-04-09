@@ -98,7 +98,6 @@ impl StyleSheet for Theme {
 			TableHeaderStyles::Default => Appearance {
 				text_color: palette.primary.strong.color,
 				background: Some(Background::Color(Color {
-					a: 0.50,
 					..palette.primary.base.color
 				})),
 				..Appearance::default()
