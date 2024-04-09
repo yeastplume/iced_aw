@@ -2,10 +2,12 @@ use iced::{
     alignment, font,
     futures::stream::Count,
     mouse::Interaction,
-    widget::{container, text, Button, Column, Container, Row, Text, TextInput},
-    Alignment, Application, Command, Element, Length, Settings, Theme,
+    widget::{container, text, Button, Column, Container, Text},
+    Alignment, Application, Command, Element, Length, Padding, Settings, Theme,
 };
-use iced_aw::{style::table_row, TableHeader, TableHeaderState, TableHeaderStyles, TableRow, TableRowStyles};
+use iced_aw::{
+    style::table_row, TableHeader, TableHeaderState, TableHeaderStyles, TableRow, TableRowStyles,
+};
 
 fn main() -> iced::Result {
     TableExample::run(Settings {
@@ -39,9 +41,11 @@ async fn load() -> Result<(), String> {
 
 impl TableExample {
     pub fn sample_cell<'a>(row_id: u16, col_id: u16) -> Text<'a> {
-        Text::new(format!("Column {}_{}", row_id, col_id))
-            .width(Length::Fill)
-            .height(Length::Fixed(50.0.into()))
+        Text::new(format!("Cell_{}_{}", col_id, row_id))
+            .width(Length::FillPortion(1))
+            .height(Length::Fixed(30.0.into()))
+            .horizontal_alignment(alignment::Horizontal::Center)
+            .size(20.0)
     }
 
     pub fn sample_row<'a>(col_count: u16, row_id: u16) -> Vec<Text<'a>> {
@@ -60,7 +64,12 @@ impl TableExample {
         let mut table_rows = vec![];
         for i in 0..row_count {
             let row = TableExample::sample_row(col_count, i);
-            table_rows.push(TableRow::new(row, i).style(TableRowStyles::Default));
+            table_rows.push(
+                TableRow::new(row, i)
+                    .style(TableRowStyles::Default)
+                    .width(Length::Fill)
+                    //.padding(Padding::new(10.0)),
+            );
         }
         table_rows
     }
@@ -72,7 +81,13 @@ impl TableExample {
         let column_keys = vec!["Column 1", "Column 2", "Column 3"];
         let mut column_headers = vec![];
         for column_key in column_keys.iter() {
-            let column_header_button = Button::new(Text::new(*column_key).size(20.0));
+            let column_header_button = Button::new(
+                Text::new(*column_key)
+                    .size(20.0)
+                    .width(Length::Fill)
+                    .horizontal_alignment(alignment::Horizontal::Center),
+            )
+            .width(Length::FillPortion(1));
             // TODO: On press
 
             let column_header_container = Container::new(column_header_button);
@@ -81,8 +96,9 @@ impl TableExample {
         }
 
         TableHeader::new(state.header_state.clone(), column_headers, None, None)
-            .spacing(5)
+            .spacing(10)
             .width(Length::Fill)
+            //.padding(Padding::new(10.0))
             .style(TableHeaderStyles::Default)
     }
 }

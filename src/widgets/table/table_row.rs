@@ -4,7 +4,7 @@
 
 use iced::{
     advanced::{
-        layout::{Limits, Node, flex},
+        layout::{flex, Limits, Node},
         overlay, renderer,
         widget::Tree,
         Clipboard, Layout, Shell, Widget,
@@ -51,7 +51,7 @@ where
     Theme: StyleSheet,
 {
     padding: Padding,
-	spacing: u16,
+    spacing: u16,
     width: Length,
     height: Length,
     max_width: u32,
@@ -75,19 +75,18 @@ where
     where
         T: Into<Element<'a, Message, Theme, Renderer>>,
     {
-		let mut left = false;
-		let mut right = false;
-       	let mut children = vec![];
+        let mut left = false;
+        let mut right = false;
+        let mut children = vec![];
 
-		for container in row_content {
-			// add container to children
-			children.push(container.into());
-		}
+        for container in row_content {
+            // add container to children
+            children.push(container.into());
+        }
 
-
-		 Self {
+        Self {
             padding: Padding::ZERO,
-			spacing: 0,
+            spacing: 0,
             width: Length::Shrink,
             height: Length::Shrink,
             max_width: u32::MAX,
@@ -185,6 +184,10 @@ where
     Renderer: 'a + renderer::Renderer + iced::advanced::text::Renderer,
     Theme: StyleSheet,
 {
+    fn children(&self) -> Vec<Tree> {
+        self.children.iter().map(Tree::new).collect()
+    }
+
     fn size(&self) -> Size<Length> {
         Size {
             width: self.width,
@@ -213,19 +216,18 @@ where
         content = content.align(self.horizontal_alignment, self.vertical_alignment, size);
 
         Node::with_children(size.expand(self.padding), vec![content])*/
-		flex::resolve(
-			flex::Axis::Horizontal,
-			renderer,
-			&limits,
-			self.width,
-			self.height,
-			self.padding,
-			self.spacing as f32,
-			Alignment::Start,
-			&self.children,
-			&mut tree.children,
-		)
-
+        flex::resolve(
+            flex::Axis::Horizontal,
+            renderer,
+            &limits,
+            self.width,
+            self.height,
+            self.padding,
+            self.spacing as f32,
+            Alignment::Start,
+            &self.children,
+            &mut tree.children,
+        )
     }
 
     fn draw(
@@ -248,7 +250,6 @@ where
         }
 
         let is_mouse_over = custom_bounds.contains(cursor_position);
-        let content_layout = layout.children().next().unwrap();
 
         let appearance = if is_mouse_over {
             theme.hovered(&self.style, self.row_id)
@@ -258,22 +259,22 @@ where
 
         let background = renderer::Quad {
             bounds: Rectangle {
-                x: bounds.x + appearance.offset_left as f32,
+                x: bounds.x + appearance.row.offset_left as f32,
                 y: bounds.y,
-                width: bounds.width - appearance.offset_right as f32,
+                width: bounds.width - appearance.row.offset_right as f32,
                 height: custom_bounds.height,
             },
             border: Border {
-                width: appearance.border_width,
-                color: appearance.border_color,
-                radius: appearance.border_radius.into(),
+                width: appearance.row.border_width,
+                color: appearance.row.border_color,
+                radius: appearance.row.border_radius.into(),
             },
             shadow: Default::default(),
         };
 
         renderer.fill_quad(
             background.into(),
-            appearance.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+            appearance.row.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
         );
 
         /*self.content.as_widget().draw(
@@ -292,7 +293,26 @@ where
             .zip(&tree.children)
             .zip(layout.children())
         {
-			println!("child");
+			// Draw cell background, if required
+            let cell_background = renderer::Quad {
+                bounds: Rectangle {
+                    x: layout.bounds().x,
+                    y: layout.bounds().y,
+                    width: layout.bounds().width,
+                    height: layout.bounds().height,
+                },
+                border: Border {
+                    width: appearance.cell.border_width,
+                    color: appearance.cell.border_color,
+                    radius: appearance.cell.border_radius.into(),
+                },
+                shadow: Default::default(),
+            };
+            renderer.fill_quad(
+                cell_background.into(),
+                appearance.cell.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+            );
+
             child
                 .as_widget()
                 .draw(state, renderer, theme, style, layout, cursor, viewport)
@@ -378,7 +398,7 @@ where
             }
             _ => status_from_content,
         }*/
-		event::Status::Ignored
+        event::Status::Ignored
     }
 
     fn overlay<'b>(
@@ -394,7 +414,7 @@ where
             renderer,
             cursor,
         )*/
-		None
+        None
     }
 }
 

@@ -172,6 +172,12 @@ where
 		self
 	}
 
+	/// Sets the padding of the [`TableHeader`].
+	pub fn padding(mut self, padding: Padding) -> Self {
+		self.padding = padding;
+		self
+	}
+
 	/// Sets the leeway for resizing the columns
 	pub fn on_resize<F>(mut self, leeway: u16, f: F) -> Self
 	where
@@ -255,6 +261,58 @@ where
 			&self.children,
 			&mut tree.children,
 		)
+	}
+
+	fn draw(
+		&self,
+		tree: &Tree,
+		renderer: &mut Renderer,
+		theme: &Theme,
+		style: &renderer::Style,
+		layout: Layout<'_>,
+		cursor: mouse::Cursor,
+		viewport: &Rectangle,
+	) {
+		let bounds = layout.bounds();
+		let cursor_position = cursor.position().unwrap_or_default();
+		let is_mouse_over = bounds.contains(cursor_position);
+
+		let appearance = if is_mouse_over {
+			theme.hovered(&self.style)
+		} else {
+			theme.appearance(&self.style)
+		};
+
+		let background = renderer::Quad {
+			bounds: Rectangle {
+				x: bounds.x + appearance.offset_left as f32,
+				y: bounds.y,
+				width: bounds.width - appearance.offset_right as f32,
+				height: bounds.height,
+			},
+			border: Border {
+				width: appearance.border_width,
+				color: appearance.border_color,
+				radius: appearance.border_radius.into(),
+			},
+			shadow: Default::default(),
+		};
+
+		renderer.fill_quad(
+			background.into(),
+			appearance.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+		);
+
+		for ((child, state), layout) in self
+			.children
+			.iter()
+			.zip(&tree.children)
+			.zip(layout.children())
+		{
+			child
+				.as_widget()
+				.draw(state, renderer, theme, style, layout, cursor, viewport)
+		}
 	}
 
 	fn on_event(
@@ -386,57 +444,6 @@ where
 			.fold(event::Status::Ignored, event::Status::merge)
 	}
 
-	fn draw(
-		&self,
-		tree: &Tree,
-		renderer: &mut Renderer,
-		theme: &Theme,
-		style: &renderer::Style,
-		layout: Layout<'_>,
-		cursor: mouse::Cursor,
-		viewport: &Rectangle,
-	) {
-		let bounds = layout.bounds();
-		let cursor_position = cursor.position().unwrap_or_default();
-		let is_mouse_over = bounds.contains(cursor_position);
-
-		let appearance = if is_mouse_over {
-			theme.hovered(&self.style)
-		} else {
-			theme.appearance(&self.style)
-		};
-
-		let background = renderer::Quad {
-			bounds: Rectangle {
-				x: bounds.x + appearance.offset_left as f32,
-				y: bounds.y,
-				width: bounds.width - appearance.offset_right as f32,
-				height: bounds.height,
-			},
-			border: Border {
-				width: appearance.border_width,
-				color: appearance.border_color,
-				radius: appearance.border_radius.into(),
-			},
-			shadow: Default::default(),
-		};
-
-		renderer.fill_quad(
-			background.into(),
-			appearance.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
-		);
-
-		for ((child, state), layout) in self
-			.children
-			.iter()
-			.zip(&tree.children)
-			.zip(layout.children())
-		{
-			child
-				.as_widget()
-				.draw(state, renderer, theme, style, layout, cursor, viewport)
-		}
-	}
 
 	fn mouse_interaction(
 		&self,
