@@ -5,12 +5,12 @@
 use iced::{
     advanced::{
         layout::{flex, Limits, Node},
-        overlay, renderer,
+        renderer,
         widget::Tree,
         Clipboard, Layout, Shell, Widget,
     },
-    event, mouse, Alignment, Border, Element, Event, Length, Padding, Point, Rectangle, Size,
-    Vector,
+    event, mouse, Alignment, Background, Border, Color, Element, Event, Length, Padding, Rectangle,
+    Size,
 };
 
 pub use crate::style::table_row::StyleSheet;
@@ -75,8 +75,6 @@ where
     where
         T: Into<Element<'a, Message, Theme, Renderer>>,
     {
-        let mut left = false;
-        let mut right = false;
         let mut children = vec![];
 
         for container in row_content {
@@ -196,26 +194,7 @@ where
     }
 
     fn layout(&self, tree: &mut Tree, renderer: &Renderer, limits: &Limits) -> Node {
-        let limits = limits
-            .loose()
-            .width(self.width)
-            .height(self.height)
-            .shrink(self.padding);
-
-        /*let mut content = self
-            .children
-            .as_widget()
-            .layout(tree, renderer, &limits.loose());
-        let size = limits.resolve(self.width, self.height, content.size());
-
-        // TODO: MODIFIED COORDINATES, CHECK
-        content = content.move_to(Point::new(
-            self.padding.top as f32,
-            self.padding.left as f32,
-        ));
-        content = content.align(self.horizontal_alignment, self.vertical_alignment, size);
-
-        Node::with_children(size.expand(self.padding), vec![content])*/
+        let limits = limits.loose().width(self.width).height(self.height);
         flex::resolve(
             flex::Axis::Horizontal,
             renderer,
@@ -274,18 +253,11 @@ where
 
         renderer.fill_quad(
             background.into(),
-            appearance.row.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+            appearance
+                .row
+                .background
+                .unwrap_or(Background::Color(Color::TRANSPARENT)),
         );
-
-        /*self.content.as_widget().draw(
-            &tree,
-            renderer,
-            theme,
-            style,
-            content_layout,
-            cursor,
-            viewport,
-        );*/
 
         for ((child, state), layout) in self
             .children
@@ -293,7 +265,7 @@ where
             .zip(&tree.children)
             .zip(layout.children())
         {
-			// Draw cell background, if required
+            // Draw cell background, if required
             let cell_background = renderer::Quad {
                 bounds: Rectangle {
                     x: layout.bounds().x,
@@ -310,7 +282,10 @@ where
             };
             renderer.fill_quad(
                 cell_background.into(),
-                appearance.cell.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+                appearance
+                    .cell
+                    .background
+                    .unwrap_or(Background::Color(Color::TRANSPARENT)),
             );
 
             child
@@ -357,18 +332,20 @@ where
 
     fn on_event(
         &mut self,
-        tree: &mut Tree,
+        _tree: &mut Tree,
         event: Event,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
-        renderer: &Renderer,
-        clipboard: &mut dyn Clipboard,
+        _renderer: &Renderer,
+        _clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
-        viewport: &Rectangle,
+        _viewport: &Rectangle,
     ) -> event::Status {
         let cursor_position = cursor.position().unwrap_or_default();
-        /*let status_from_content = layout.on_event(
-            &mut tree,
+        let _in_bounds = layout.bounds().contains(cursor_position);
+
+        /*let status_from_content = self.container.unwrap().on_event(
+            tree,
             event.clone(),
             layout.children().next().unwrap(),
             cursor,
@@ -376,46 +353,43 @@ where
             clipboard,
             shell,
             viewport,
-        );
-        match status_from_content {
-            event::Status::Ignored => {
-                if let Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) = event {
-                    if let Some(on_press) = &self.on_press {
-                        let mut bounds = layout.bounds();
+        );*/
+        match event {
+            Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) => {
+                if let Some(on_press) = &self.on_press {
+                    let mut bounds = layout.bounds();
 
-                        // was inner row height set?
-                        if self.inner_row_height != u32::MAX {
-                            //We can face issues if the row is expanded, so we manage it by having a reduced bounds area to check for pointer
-                            bounds.height = self.inner_row_height as f32;
-                        }
+                    // was inner row height set?
+                    if self.inner_row_height != u32::MAX {
+                        //We can face issues if the row is expanded, so we manage it by having a reduced bounds area to check for pointer
+                        bounds.height = self.inner_row_height as f32;
+                    }
 
-                        if bounds.contains(cursor_position) {
-                            shell.publish(on_press(event));
-                        }
+                    if bounds.contains(cursor_position) {
+                        shell.publish(on_press(event));
                     }
                 }
-                status_from_content
+                event::Status::Captured
             }
-            _ => status_from_content,
-        }*/
-        event::Status::Ignored
+            _ => event::Status::Ignored,
+        }
     }
 
-    fn overlay<'b>(
+    /*fn overlay<'b>(
         &'b mut self,
         tree: &'b mut Tree,
         layout: Layout<'_>,
         renderer: &Renderer,
         cursor: Vector, // Change the type of the `cursor` parameter
     ) -> Option<overlay::Element<'b, Message, Theme, Renderer>> {
-        /*self.overlay(
+        /*tree(
             tree,
             layout.children().next().unwrap(),
             renderer,
             cursor,
         )*/
         None
-    }
+    }*/
 }
 
 impl<'a, Message, Theme, Renderer> From<TableRow<'a, Message, Theme, Renderer>>

@@ -12,7 +12,7 @@ use iced::{
 	widget::space::Space,
     event,
     mouse,
-    Alignment, Border, Element, Event, Length, Padding, Point, Rectangle,
+    Alignment, Background, Border, Color, Element, Event, Length, Padding, Point, Rectangle,
     Size
 };
 
@@ -300,7 +300,7 @@ where
 
 		renderer.fill_quad(
 			background.into(),
-			appearance.background.unwrap(), //.unwrap_or(Background::Color(Color::TRANSPARENT)),
+			appearance.background.unwrap_or(Background::Color(Color::TRANSPARENT)),
 		);
 
 		for ((child, state), layout) in self
