@@ -1,0 +1,13 @@
+[package]
+name = "table"
+version = "0.1.0"
+authors = ["Yeastplume <yeastplume@gmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+iced_aw = { workspace = true, features = ["table", "icons"] }
+iced = { workspace = true, features = [
+    "wgpu",
+] }

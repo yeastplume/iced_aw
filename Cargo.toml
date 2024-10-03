@@ -26,6 +26,7 @@ glow = []                                                   # TODO
 tab_bar = []
 tabs = ["tab_bar"]
 time_picker = ["chrono", "iced/canvas"]
+table = []
 wrap = []
 number_input = ["num-format", "num-traits", "typed_input"]
 typed_input = []
@@ -47,6 +48,7 @@ default = [
     "grid",
     "tab_bar",
     "tabs",
+    "table",
     "time_picker",
     "slide_bar",
     "wrap",

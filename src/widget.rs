@@ -60,6 +60,9 @@ pub mod tabs;
 #[cfg(feature = "tabs")]
 pub use tabs::{TabBarPosition, Tabs};
 
+#[cfg(feature = "table")]
+pub mod table;
+
 #[cfg(feature = "time_picker")]
 pub mod time_picker;
 #[cfg(feature = "time_picker")]
