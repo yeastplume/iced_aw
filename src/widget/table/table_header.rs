@@ -9,7 +9,7 @@ use iced::{
         widget::Tree,
         Clipboard, Layout, Shell, Widget,
     },
-	widget::space::Space,
+	widget::Space,
     event,
     mouse,
     Alignment, Background, Border, Color, Element, Event, Length, Padding, Point, Rectangle,
